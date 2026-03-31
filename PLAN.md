@@ -43,21 +43,73 @@ The project will move faster if the UI, routing, and core user flows are working
 - warehouse page displays a table for top late-delivery-risk orders
 - **Run Scoring** button exists in the UI even if temporarily mocked
 
-### Suggested tasks
+### Step-by-step build plan
+
+#### Step 1: Bootstrap the app shell
 - initialize repo with Next.js + TypeScript + Tailwind
-- create base layout and navigation
-- define initial TypeScript data models
-- create mock data for customers and orders
-- scaffold each page with placeholder data
-- build shared UI components such as:
-  - customer selector
-  - summary cards
-  - order table
-  - new order form
-  - priority queue table
-  - scoring action button
-- make navigation between pages work cleanly
-- ensure the site is demoable even before real data is connected
+- confirm the app runs locally
+- clean up starter code so the project has a simple baseline
+
+#### Step 2: Set up layout and routing
+- create the base layout
+- add top-level navigation
+- create routes for all required pages
+- verify every route renders without errors
+
+#### Step 3: Define the app data shape
+- define initial TypeScript models for customers, orders, and queue rows
+- decide what sample fields each screen needs
+- keep models simple and aligned with likely Supabase tables
+
+#### Step 4: Add mock data and demo helpers
+- create mock customer and order data
+- add lightweight helper functions for reading mock records
+- make sure the UI can be built without waiting on real database work
+
+#### Step 5: Scaffold all required pages
+- build the page shell for **Select Customer**
+- build the page shell for **Customer Dashboard**
+- build the page shell for **New Order**
+- build the page shell for **Order History**
+- build the page shell for **Late Delivery Priority Queue**
+
+#### Step 6: Build shared UI pieces
+- build a customer selector component
+- build summary cards
+- build an order table
+- build a new order form
+- build a priority queue table
+- add a visible **Run Scoring** button
+
+#### Step 7: Wire the happy-path navigation
+- connect customer selection to the customer dashboard
+- connect dashboard links to order history and new order
+- connect warehouse navigation to the queue page
+- make the back-and-forth flow feel clean and easy to demo
+
+#### Step 8: Make each page show believable data
+- display recent order information on the dashboard
+- show customer-specific orders on the history page
+- prefill or contextualize the new order flow for the selected customer
+- show mock ranked orders on the priority queue page
+
+#### Step 9: Make the new order flow feel complete
+- validate the basic form inputs
+- handle submit with a temporary mock success flow
+- show the new order in local UI state or mock history after submission
+
+#### Step 10: Add Phase 1 polish and checks
+- review the app for broken routes or missing states
+- test every page locally after it is built
+- confirm the app is easy to explain and demo
+- leave clear seams for replacing mocks with Supabase in Phase 2
+
+### Demo checkpoints
+- checkpoint 1: app starts locally and all routes load
+- checkpoint 2: all required pages exist with placeholder content
+- checkpoint 3: shared components are wired across the pages
+- checkpoint 4: mock customer flow works end to end
+- checkpoint 5: warehouse queue and **Run Scoring** UI are demoable
 
 ### Exit criteria
 Phase 1 is complete when the app can be opened locally and all required pages work with mock or temporary data.
