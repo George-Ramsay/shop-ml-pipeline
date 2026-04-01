@@ -1,4 +1,8 @@
+import { notFound } from "next/navigation";
+
+import { OrdersTable } from "@/components/orders-table";
 import { PageFrame } from "@/components/page-frame";
+import { getCustomerById, getOrdersByCustomerId } from "@/lib/mock-data";
 
 type OrderHistoryPageProps = {
   params: Promise<{
@@ -10,32 +14,43 @@ export default async function OrderHistoryPage({
   params,
 }: OrderHistoryPageProps) {
   const { id } = await params;
+  const customerId = Number(id);
+  const customer = getCustomerById(customerId);
+
+  if (!customer) {
+    notFound();
+  }
+
+  const orders = getOrdersByCustomerId(customerId);
 
   return (
     <PageFrame
       eyebrow="Order History"
-      title={`Order history route for ${id}`}
-      description="This page confirms the order-history route is wired correctly. It will later render a customer-scoped order table once mock records and shared table components are added."
+      title={`${customer.fullName} order history`}
+      description="This page now renders a customer-scoped order table with mock records. It mirrors the shape we will later read from Supabase so the UI can be demoed and reviewed now."
       actions={[
         {
-          href: `/customer/${id}`,
+          href: `/customer/${customerId}`,
           label: "Back to dashboard",
         },
         {
-          href: `/customer/${id}/new-order`,
+          href: `/customer/${customerId}/new-order`,
           label: "Create new order",
         },
       ]}
     >
-      <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-white p-6">
-        <p className="text-sm font-semibold text-slate-950">
-          Placeholder order list
-        </p>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-          The route is active and ready for the shared order table. In the next
-          steps we will define the order shape, seed mock records, and show a
-          customer-specific list here.
-        </p>
+      <div className="space-y-4">
+        <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
+          <p className="text-sm font-semibold text-slate-950">
+            {orders.length} orders loaded
+          </p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            The table below is driven by shared order types and mock helpers, so
+            the later database swap should stay mostly inside the data layer.
+          </p>
+        </div>
+
+        <OrdersTable orders={orders} />
       </div>
     </PageFrame>
   );
