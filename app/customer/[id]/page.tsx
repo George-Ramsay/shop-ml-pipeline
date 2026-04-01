@@ -3,12 +3,9 @@ import { notFound } from "next/navigation";
 import { PageFrame } from "@/components/page-frame";
 import { SummaryCard } from "@/components/summary-card";
 import { formatCurrency, formatDateTime } from "@/lib/format";
-import {
-  getCustomerById,
-  getCustomerLifetimeSpend,
-  getLatestOrderForCustomer,
-  getOrderCountByCustomer,
-} from "@/lib/mock-data";
+import { getCustomerDashboardData } from "@/lib/shop-data";
+
+export const dynamic = "force-dynamic";
 
 type CustomerDashboardPageProps = {
   params: Promise<{
@@ -21,21 +18,19 @@ export default async function CustomerDashboardPage({
 }: CustomerDashboardPageProps) {
   const { id } = await params;
   const customerId = Number(id);
-  const customer = getCustomerById(customerId);
+  const data = await getCustomerDashboardData(customerId);
 
-  if (!customer) {
+  if (!data) {
     notFound();
   }
 
-  const latestOrder = getLatestOrderForCustomer(customerId);
-  const orderCount = getOrderCountByCustomer(customerId);
-  const lifetimeSpend = getCustomerLifetimeSpend(customerId);
+  const { customer, latestOrder, orderCount, lifetimeSpend } = data;
 
   return (
     <PageFrame
       eyebrow="Customer Dashboard"
       title={customer.fullName}
-      description={`${customer.email} · ${customer.city}, ${customer.state}. This dashboard is now backed by mock customer and order data so the main user flow is demoable while the real data layer is still pending.`}
+      description={`${customer.email} | ${customer.city}, ${customer.state}. This dashboard now reads the live customer and order records stored in Supabase.`}
       actions={[
         {
           href: `/customer/${customerId}/orders`,
@@ -56,12 +51,12 @@ export default async function CustomerDashboardPage({
         <SummaryCard
           label="Orders placed"
           value={String(orderCount)}
-          detail="Mock order history currently available for this customer."
+          detail="Counted from the current deployed order history."
         />
         <SummaryCard
           label="Lifetime spend"
           value={formatCurrency(lifetimeSpend)}
-          detail="Calculated from the mock orders used in the Phase 1 UI."
+          detail="Calculated from the orders currently stored for this customer."
         />
         <SummaryCard
           label="Latest order"
@@ -113,8 +108,8 @@ export default async function CustomerDashboardPage({
               : "Once orders are available, this panel can show the latest activity summary."}
           </p>
           <p className="mt-4 text-sm leading-6 text-slate-600">
-            This screen is ready for the future Supabase query swap because the
-            card layout now expects stable customer and order fields.
+            The layout is now powered by Supabase-backed reads, so what you see
+            here reflects the deployed dataset instead of seeded placeholders.
           </p>
         </div>
       </div>

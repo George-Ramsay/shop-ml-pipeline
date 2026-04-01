@@ -1,21 +1,28 @@
 import Link from "next/link";
 
 import { PageFrame } from "@/components/page-frame";
-import { DEMO_CUSTOMER_ID } from "@/lib/demo";
-import { getCustomers, getOrderCountByCustomer } from "@/lib/mock-data";
+import {
+  getCustomerNavigationContext,
+  getCustomersWithOrderCounts,
+} from "@/lib/shop-data";
 
-export default function Home() {
-  const customers = getCustomers();
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const [{ defaultCustomerId }, customers] = await Promise.all([
+    getCustomerNavigationContext(),
+    getCustomersWithOrderCounts(),
+  ]);
 
   return (
     <PageFrame
       eyebrow="Select Customer"
       title="Choose a customer to start the workflow"
-      description="The live app now has mock customer records wired in so the dashboard, order history, and new-order flow can be demoed end to end before Supabase integration."
+      description="Customer records are loaded directly from Supabase so the dashboard, order history, and order-entry flow reflect the deployed dataset."
       actions={[
         {
-          href: `/customer/${DEMO_CUSTOMER_ID}`,
-          label: "Open demo customer dashboard",
+          href: defaultCustomerId ? `/customer/${defaultCustomerId}` : "/",
+          label: "Open first customer dashboard",
         },
         {
           href: "/warehouse/priority-queue",
@@ -24,7 +31,7 @@ export default function Home() {
       ]}
     >
       <div className="grid gap-4 lg:grid-cols-3">
-        {customers.map((customer) => (
+        {customers.map(({ customer, orderCount }) => (
           <Link
             key={customer.customerId}
             href={`/customer/${customer.customerId}`}
@@ -55,9 +62,7 @@ export default function Home() {
                 <p className="text-xs uppercase tracking-wide text-slate-400">
                   Orders
                 </p>
-                <p className="mt-1 font-medium text-slate-950">
-                  {getOrderCountByCustomer(customer.customerId)}
-                </p>
+                <p className="mt-1 font-medium text-slate-950">{orderCount}</p>
               </div>
             </div>
 

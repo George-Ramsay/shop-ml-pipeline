@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 
 import { OrdersTable } from "@/components/orders-table";
 import { PageFrame } from "@/components/page-frame";
-import { getCustomerById, getOrdersByCustomerId } from "@/lib/mock-data";
+import { getCustomerOrdersData } from "@/lib/shop-data";
+
+export const dynamic = "force-dynamic";
 
 type OrderHistoryPageProps = {
   params: Promise<{
@@ -15,19 +17,19 @@ export default async function OrderHistoryPage({
 }: OrderHistoryPageProps) {
   const { id } = await params;
   const customerId = Number(id);
-  const customer = getCustomerById(customerId);
+  const data = await getCustomerOrdersData(customerId);
 
-  if (!customer) {
+  if (!data) {
     notFound();
   }
 
-  const orders = getOrdersByCustomerId(customerId);
+  const { customer, orders } = data;
 
   return (
     <PageFrame
       eyebrow="Order History"
       title={`${customer.fullName} order history`}
-      description="This page now renders a customer-scoped order table with mock records. It mirrors the shape we will later read from Supabase so the UI can be demoed and reviewed now."
+      description="This table is loaded from Supabase and shows the current deployed order history for the selected customer."
       actions={[
         {
           href: `/customer/${customerId}`,
@@ -45,8 +47,8 @@ export default async function OrderHistoryPage({
             {orders.length} orders loaded
           </p>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            The table below is driven by shared order types and mock helpers, so
-            the later database swap should stay mostly inside the data layer.
+            The rows below come from the live <code>orders</code> table, mapped
+            into the same UI shape the rest of the app uses.
           </p>
         </div>
 

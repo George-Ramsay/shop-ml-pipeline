@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 
 import { PageFrame } from "@/components/page-frame";
 import { formatCurrency } from "@/lib/format";
-import { getCustomerById, getNewOrderDraft } from "@/lib/mock-data";
+import { getNewOrderPageData } from "@/lib/shop-data";
+
+export const dynamic = "force-dynamic";
 
 type NewOrderPageProps = {
   params: Promise<{
@@ -13,18 +15,13 @@ type NewOrderPageProps = {
 export default async function NewOrderPage({ params }: NewOrderPageProps) {
   const { id } = await params;
   const customerId = Number(id);
-  const customer = getCustomerById(customerId);
+  const data = await getNewOrderPageData(customerId);
 
-  if (!customer) {
+  if (!data) {
     notFound();
   }
 
-  const draft = getNewOrderDraft(customerId);
-
-  if (!draft) {
-    notFound();
-  }
-
+  const { customer, draft } = data;
   const estimatedTotal =
     draft.orderSubtotal + draft.shippingFee + draft.taxAmount;
 
@@ -32,7 +29,7 @@ export default async function NewOrderPage({ params }: NewOrderPageProps) {
     <PageFrame
       eyebrow="New Order"
       title={`Create a new order for ${customer.fullName}`}
-      description="This page now shows a believable order-entry layout with seeded values and a checkout summary. It is still mock-backed, but it gives us a full demo path before the write flow is wired to Supabase."
+      description="This order-entry view is now seeded from live customer and recent-order data in Supabase, so the form context reflects the deployed dataset."
       actions={[
         {
           href: `/customer/${customerId}`,
@@ -98,8 +95,8 @@ export default async function NewOrderPage({ params }: NewOrderPageProps) {
             </label>
           </div>
           <div className="mt-5 rounded-[1.5rem] bg-cyan-50 px-5 py-4 text-sm leading-6 text-cyan-900">
-            This is a read-only mock form for now. The next iteration can turn
-            it into a true submit flow without changing the page structure.
+            This is still a read-only form, but the defaults are derived from
+            live customer and order records instead of hardcoded demo values.
           </div>
         </div>
 
@@ -136,7 +133,7 @@ export default async function NewOrderPage({ params }: NewOrderPageProps) {
               type="button"
               className="mt-5 w-full rounded-full bg-slate-950 px-4 py-3 text-sm font-medium text-white"
             >
-              Submit Mock Order
+              Submit Order
             </button>
           </div>
 

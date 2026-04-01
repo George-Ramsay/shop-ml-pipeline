@@ -1,16 +1,18 @@
-import { MockScoringPanel } from "@/components/mock-scoring-panel";
 import { PageFrame } from "@/components/page-frame";
 import { PriorityQueueTable } from "@/components/priority-queue-table";
-import { getPriorityQueueRows } from "@/lib/mock-data";
+import { ScoringPanel } from "@/components/scoring-panel";
+import { getPriorityQueueRows } from "@/lib/shop-data";
 
-export default function PriorityQueuePage() {
-  const rows = getPriorityQueueRows();
+export const dynamic = "force-dynamic";
+
+export default async function PriorityQueuePage() {
+  const rows = await getPriorityQueueRows();
 
   return (
     <PageFrame
       eyebrow="Late Delivery Priority Queue"
       title="Warehouse late-delivery queue"
-      description="The warehouse route now renders ranked mock orders so the scoring workflow can be demoed before the real pipeline is connected."
+      description="This warehouse queue is ranked from the deployed Supabase order and shipment data."
       actions={[
         {
           href: "/",
@@ -25,16 +27,16 @@ export default function PriorityQueuePage() {
               {rows.length} ranked orders
             </p>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-              These rows are derived from shared mock order and shipment data so
-              the queue page has a believable end-to-end state before ML
-              integration.
+              These rows are computed from the live <code>orders</code>,{" "}
+              <code>customers</code>, and <code>shipments</code> tables so the
+              queue reflects the current deployed data.
             </p>
           </div>
 
           <PriorityQueueTable rows={rows} />
         </div>
 
-        <MockScoringPanel />
+        <ScoringPanel />
       </div>
     </PageFrame>
   );
