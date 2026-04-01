@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { DataSourceStatus } from "@/components/data-source-status";
 import { DEMO_CUSTOMER_ID } from "@/lib/demo";
 
 const navItems = [
@@ -36,9 +37,12 @@ export function AppShell({ children }: AppShellProps) {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              Demo customer route uses <code>{DEMO_CUSTOMER_ID}</code> and is
-              ready for mock data walkthroughs.
+            <div className="space-y-3">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                Demo customer route uses <code>{DEMO_CUSTOMER_ID}</code> and is
+                ready for mock data walkthroughs.
+              </div>
+              <DataSourceStatus />
             </div>
           </div>
 

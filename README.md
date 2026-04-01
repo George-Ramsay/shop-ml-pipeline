@@ -40,6 +40,16 @@ Planned stack:
 - **ML:** Python, pandas, scikit-learn, Jupyter
 - **Deployment:** Vercel
 
+## Environment Variables
+
+The app now recognizes these Supabase environment variables for Vercel and local development:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SECRET_KEY`
+
+For compatibility with older naming, the code also accepts `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` as fallbacks.
+
 ## Repository Goals
 
 - keep the app simple and demo-ready
