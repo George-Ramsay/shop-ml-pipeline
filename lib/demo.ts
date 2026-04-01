@@ -1,1 +1,1 @@
-export const DEMO_CUSTOMER_ID = "customer-1001";
+export const DEMO_CUSTOMER_ID = "1";
