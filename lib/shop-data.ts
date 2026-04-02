@@ -55,10 +55,16 @@ type ShipmentRow = {
 };
 
 type QueueOrderRow = OrderRow & {
-  customers: {
-    customer_id: number;
-    full_name: string;
-  } | null;
+  customers:
+    | {
+        customer_id: number;
+        full_name: string;
+      }
+    | {
+        customer_id: number;
+        full_name: string;
+      }[]
+    | null;
   shipments: ShipmentRow | ShipmentRow[] | null;
 };
 
@@ -314,11 +320,12 @@ export async function getPriorityQueueRows(limit = 50) {
   }
 
   return ((data ?? []) as QueueOrderRow[]).flatMap((row) => {
+    const customer = Array.isArray(row.customers) ? row.customers[0] ?? null : row.customers;
     const shipment = Array.isArray(row.shipments)
       ? row.shipments[0] ?? null
       : row.shipments;
 
-    if (!row.customers || !shipment) {
+    if (!customer || !shipment) {
       return [];
     }
 
@@ -336,8 +343,8 @@ export async function getPriorityQueueRows(limit = 50) {
     return [
       {
         orderId: row.order_id,
-        customerId: row.customers.customer_id,
-        customerName: row.customers.full_name,
+        customerId: customer.customer_id,
+        customerName: customer.full_name,
         orderDatetime: row.order_datetime,
         shippingState: row.shipping_state,
         carrier: shipment.carrier,
