@@ -10,10 +10,7 @@ type AppShellProps = {
 export function AppShell({ children }: AppShellProps) {
   const customerHref = `/customer/${DEMO_CUSTOMER_ID}`;
   const navItems = [
-    { href: "/", label: "Select Customer" },
-    { href: customerHref, label: "Customer Dashboard" },
-    { href: `${customerHref}/new-order`, label: "New Order" },
-    { href: `${customerHref}/orders`, label: "Order History" },
+    { href: "/", label: "Home" },
     { href: "/warehouse/priority-queue", label: "Priority Queue" },
   ];
 
