@@ -24,21 +24,10 @@ export function AppShell({ children }: AppShellProps) {
     <div className="min-h-screen">
       <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-6 py-4 lg:px-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-700">
-                Shop ML Pipeline
-              </p>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
-                  Operations workspace
-                </h1>
-                <p className="max-w-2xl text-sm leading-6 text-slate-600">
-                  Customer and order workflows with demo routes and Supabase
-                  configuration status.
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
+              Shop ML Pipeline
+            </h1>
 
             <nav
               aria-label="Primary"
