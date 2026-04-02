@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { DismissibleNotification } from "@/components/dismissible-notification";
 import { DEMO_CUSTOMER_ID } from "@/lib/demo";
 
 type AppShellProps = {
@@ -60,31 +61,27 @@ export function AppShell({ children }: AppShellProps) {
       <section aria-label="Live notifications" className="border-b border-slate-200/80 bg-white/65">
         <div className="mx-auto w-full max-w-7xl px-6 py-3 lg:px-8">
           <div className="grid gap-3 md:grid-cols-2">
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              <p>
+            <DismissibleNotification
+              className="border border-slate-200 bg-slate-50 text-slate-600"
+              badgeClassName="bg-cyan-100 text-cyan-800"
+              dotClassName="bg-cyan-500"
+            >
                 Demo customer route uses <code>{DEMO_CUSTOMER_ID}</code> and is ready
                 for mock data walkthroughs.
-              </p>
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-cyan-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-cyan-800">
-                <span className="size-1.5 animate-pulse rounded-full bg-cyan-500" aria-hidden="true" />
-                Live
-              </span>
-            </div>
+            </DismissibleNotification>
 
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-              <p>
+            <DismissibleNotification
+              className="border border-emerald-200 bg-emerald-50 text-emerald-900"
+              badgeClassName="bg-emerald-100 text-emerald-800"
+              dotClassName="bg-emerald-500"
+            >
                 {hasPublicSupabaseEnv
                   ? "Supabase public env detected."
                   : "Supabase public env missing."}{" "}
                 {hasServiceRoleKey
                   ? "Server-side secret key is also available."
                   : "Server-side secret key is not configured."}
-              </p>
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800">
-                <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" aria-hidden="true" />
-                Live
-              </span>
-            </div>
+            </DismissibleNotification>
           </div>
         </div>
       </section>
