@@ -1,0 +1,38 @@
+# Retrain ridge fraud model on Supabase data and write risk_score / is_fraud nightly.
+# Secrets (repository → Settings → Secrets → Actions):
+#   SUPABASE_URL          — project URL (same as NEXT_PUBLIC_SUPABASE_URL)
+#   SUPABASE_SECRET_KEY   — service role / secret key (bypasses RLS for batch updates)
+
+name: Nightly fraud pipeline
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: fraud-pipeline
+  cancel-in-progress: true
+
+jobs:
+  train-and-score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run fraud pipeline
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: npm run fraud:pipeline

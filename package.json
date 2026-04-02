@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ignore-pattern .next --ignore-pattern node_modules"
+    "lint": "eslint . --ignore-pattern .next --ignore-pattern node_modules",
+    "fraud:pipeline": "tsx scripts/nightly-fraud.ts",
+    "fraud:train": "tsx scripts/train-fraud.ts",
+    "fraud:score": "tsx scripts/score-fraud.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.101.1",
@@ -19,9 +22,12 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
+    "ml-matrix": "^6.12.1",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
