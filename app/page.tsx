@@ -42,9 +42,7 @@ export default function Home() {
 
   return (
     <PageFrame
-      eyebrow="Select Customer"
       title="Customer Portal"
-      description="Use filters and search to find a customer quickly, then open their dashboard to continue the order flow."
       actions={[
         {
           href: `/customer/${DEMO_CUSTOMER_ID}`,
