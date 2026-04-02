@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 type PageFrameProps = {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
-  description: string;
+  description?: string;
   actions?: Array<{
     href: string;
     label: string;
@@ -23,16 +23,20 @@ export function PageFrame({
     <section className="rounded-[2rem] border border-white/70 bg-white/85 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur md:p-10">
       <div className="space-y-6">
         <div className="space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-700">
-            {eyebrow}
-          </p>
+          {eyebrow ? (
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-700">
+              {eyebrow}
+            </p>
+          ) : null}
           <div className="space-y-3">
             <h2 className="text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl">
               {title}
             </h2>
-            <p className="max-w-3xl text-base leading-7 text-slate-600">
-              {description}
-            </p>
+            {description ? (
+              <p className="max-w-3xl text-base leading-7 text-slate-600">
+                {description}
+              </p>
+            ) : null}
           </div>
         </div>
 

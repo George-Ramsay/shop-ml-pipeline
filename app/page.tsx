@@ -29,9 +29,7 @@ export default async function Home() {
 
   return (
     <PageFrame
-      eyebrow="Select Customer"
-      title="Choose a customer to start the workflow"
-      description="Use filters and search to find a customer quickly, then open their dashboard to continue the order flow."
+      title="Customer Portal"
       actions={[
         {
           href: defaultCustomerId ? `/customer/${defaultCustomerId}` : "/",
