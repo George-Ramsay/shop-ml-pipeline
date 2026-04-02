@@ -43,7 +43,7 @@ export default function Home() {
   return (
     <PageFrame
       eyebrow="Select Customer"
-      title="Choose a customer to start the workflow"
+      title="Customer Portal"
       description="Use filters and search to find a customer quickly, then open their dashboard to continue the order flow."
       actions={[
         {
