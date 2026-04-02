@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { PageFrame } from "@/components/page-frame";
-import { DEMO_CUSTOMERS, DEMO_CUSTOMER_ID } from "@/lib/demo";
+import { DEMO_CUSTOMERS } from "@/lib/demo";
 
 const tierClasses = {
   gold: "bg-amber-100 text-amber-900",
@@ -43,16 +43,6 @@ export default function Home() {
   return (
     <PageFrame
       title="Customer Portal"
-      actions={[
-        {
-          href: `/customer/${DEMO_CUSTOMER_ID}`,
-          label: "Open first customer dashboard",
-        },
-        {
-          href: "/warehouse/priority-queue",
-          label: "Open warehouse queue",
-        },
-      ]}
     >
       <div className="space-y-5">
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem]">
