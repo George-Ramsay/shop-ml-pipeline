@@ -1,17 +1,11 @@
 import { CustomerSelectorTable } from "@/components/customer-selector-table";
 import { PageFrame } from "@/components/page-frame";
-import {
-  getCustomerNavigationContext,
-  getCustomersWithOrderCounts,
-} from "@/lib/shop-data";
+import { getCustomersWithOrderCounts } from "@/lib/shop-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [customers, navigation] = await Promise.all([
-    getCustomersWithOrderCounts(),
-    getCustomerNavigationContext(),
-  ]);
+  const customers = await getCustomersWithOrderCounts();
 
   const rows = customers.map(({ customer, orderCount }) => ({
     id: customer.customerId.toString(),
@@ -25,22 +19,8 @@ export default async function Home() {
     orderCount,
   }));
 
-  const defaultCustomerId = navigation.defaultCustomerId ?? rows[0]?.id ?? null;
-
   return (
-    <PageFrame
-      title="Customer Portal"
-      actions={[
-        {
-          href: defaultCustomerId ? `/customer/${defaultCustomerId}` : "/",
-          label: "Open first customer dashboard",
-        },
-        {
-          href: "/warehouse/priority-queue",
-          label: "Open warehouse queue",
-        },
-      ]}
-    >
+    <PageFrame title="Customer Portal">
       <CustomerSelectorTable customers={rows} />
     </PageFrame>
   );
