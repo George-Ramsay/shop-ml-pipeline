@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { DismissibleNotification } from "@/components/dismissible-notification";
-import { DEMO_CUSTOMER_ID } from "@/lib/demo";
 import { hasPublicSupabaseEnv } from "@/lib/supabase/env";
 import { hasServerSupabaseEnv } from "@/lib/supabase/server-env";
 
@@ -11,7 +10,6 @@ type AppShellProps = {
 };
 
 export function AppShell({ children }: AppShellProps) {
-  const customerHref = `/customer/${DEMO_CUSTOMER_ID}`;
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/warehouse/priority-queue", label: "Priority Queue" },
@@ -55,8 +53,8 @@ export function AppShell({ children }: AppShellProps) {
               badgeClassName="bg-cyan-100 text-cyan-800"
               dotClassName="bg-cyan-500"
             >
-              Demo customer route uses <code>{DEMO_CUSTOMER_ID}</code> and is ready
-              for mock data walkthroughs.
+              Customer dashboard and queue routes now read from the Supabase
+              dataset when environment configuration is available.
             </DismissibleNotification>
 
             <DismissibleNotification
