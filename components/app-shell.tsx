@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { DEMO_CUSTOMER_ID } from "@/lib/demo";
+import { hasPublicSupabaseEnv } from "@/lib/supabase/env";
+import { hasServerSupabaseEnv } from "@/lib/supabase/server-env";
 
 type AppShellProps = {
   children: ReactNode;
@@ -17,10 +19,8 @@ export function AppShell({ children }: AppShellProps) {
     { href: "/warehouse/priority-queue", label: "Priority Queue" },
   ];
 
-  const hasPublicSupabaseEnv = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
-  const hasServiceRoleKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const hasPublicSupabaseConfig = hasPublicSupabaseEnv();
+  const hasServerSupabaseConfig = hasServerSupabaseEnv();
 
   return (
     <div className="min-h-screen">
@@ -76,10 +76,10 @@ export function AppShell({ children }: AppShellProps) {
 
             <div className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
               <p>
-                {hasPublicSupabaseEnv
+                {hasPublicSupabaseConfig
                   ? "Supabase public env detected."
                   : "Supabase public env missing."}{" "}
-                {hasServiceRoleKey
+                {hasServerSupabaseConfig
                   ? "Server-side secret key is also available."
                   : "Server-side secret key is not configured."}
               </p>
