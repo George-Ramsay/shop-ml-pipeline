@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 
 import { DismissibleNotification } from "@/components/dismissible-notification";
 import { DEMO_CUSTOMER_ID } from "@/lib/demo";
+import { hasPublicSupabaseEnv } from "@/lib/supabase/env";
+import { hasServerSupabaseEnv } from "@/lib/supabase/server-env";
 
 type AppShellProps = {
   children: ReactNode;
@@ -15,10 +17,8 @@ export function AppShell({ children }: AppShellProps) {
     { href: "/warehouse/priority-queue", label: "Priority Queue" },
   ];
 
-  const hasPublicSupabaseEnv = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
-  const hasServiceRoleKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const hasPublicSupabaseConfig = hasPublicSupabaseEnv();
+  const hasServerSupabaseConfig = hasServerSupabaseEnv();
 
   return (
     <div className="min-h-screen">
@@ -55,8 +55,8 @@ export function AppShell({ children }: AppShellProps) {
               badgeClassName="bg-cyan-100 text-cyan-800"
               dotClassName="bg-cyan-500"
             >
-                Demo customer route uses <code>{DEMO_CUSTOMER_ID}</code> and is ready
-                for mock data walkthroughs.
+              Demo customer route uses <code>{DEMO_CUSTOMER_ID}</code> and is ready
+              for mock data walkthroughs.
             </DismissibleNotification>
 
             <DismissibleNotification
@@ -64,12 +64,12 @@ export function AppShell({ children }: AppShellProps) {
               badgeClassName="bg-emerald-100 text-emerald-800"
               dotClassName="bg-emerald-500"
             >
-                {hasPublicSupabaseEnv
-                  ? "Supabase public env detected."
-                  : "Supabase public env missing."}{" "}
-                {hasServiceRoleKey
-                  ? "Server-side secret key is also available."
-                  : "Server-side secret key is not configured."}
+              {hasPublicSupabaseConfig
+                ? "Supabase public env detected."
+                : "Supabase public env missing."}{" "}
+              {hasServerSupabaseConfig
+                ? "Server-side secret key is also available."
+                : "Server-side secret key is not configured."}
             </DismissibleNotification>
           </div>
         </div>
