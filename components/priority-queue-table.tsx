@@ -1,3 +1,4 @@
+import { ActualFraudReview } from "@/components/actual-fraud-review";
 import { formatDateTime, formatPercent } from "@/lib/format";
 import type { PriorityQueueRow } from "@/lib/types";
 
@@ -29,7 +30,10 @@ export function PriorityQueueTable({ rows }: PriorityQueueTableProps) {
               <th className="px-5 py-4 font-medium">Order</th>
               <th className="px-5 py-4 font-medium">Carrier</th>
               <th className="px-5 py-4 font-medium">Transit</th>
-              <th className="px-5 py-4 font-medium">Risk</th>
+              <th className="px-5 py-4 font-medium">Pred. fraud</th>
+              <th className="px-5 py-4 font-medium">Order risk</th>
+              <th className="px-5 py-4 font-medium">Human review</th>
+              <th className="px-5 py-4 font-medium">Late delivery</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -52,6 +56,24 @@ export function PriorityQueueTable({ rows }: PriorityQueueTableProps) {
                 </td>
                 <td className="px-5 py-4">
                   {row.actualDays}/{row.promisedDays} days
+                </td>
+                <td className="px-5 py-4">
+                  {row.isFraud ? (
+                    <span className="font-semibold text-rose-700">Yes</span>
+                  ) : (
+                    <span className="text-slate-500">No</span>
+                  )}
+                </td>
+                <td className="px-5 py-4 tabular-nums text-slate-800">
+                  {row.riskScore}/100
+                </td>
+                <td className="px-5 py-4">
+                  <ActualFraudReview
+                    key={`${row.customerId}-${row.orderId}-af-${row.actualFraud === null ? "n" : row.actualFraud ? "t" : "f"}`}
+                    orderId={row.orderId}
+                    customerId={row.customerId}
+                    initialActualFraud={row.actualFraud}
+                  />
                 </td>
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">

@@ -3,6 +3,9 @@
 :root {
   --background: #ecf4f3;
   --foreground: #0f172a;
+  /* No next/font/google — Turbopack on some Windows setups cannot fetch Google Fonts (http2 error). */
+  --font-geist-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-geist-mono: ui-monospace, "Cascadia Code", "Segoe UI Mono", Menlo, Monaco, Consolas, monospace;
 }
 
 @theme inline {
@@ -27,7 +30,7 @@ body {
   background-image:
     radial-gradient(circle at top left, rgba(34, 211, 238, 0.2), transparent 30%),
     radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.12), transparent 28%);
-  font-family: var(--font-geist-sans), sans-serif;
+  font-family: var(--font-geist-sans);
 }
 
 a {

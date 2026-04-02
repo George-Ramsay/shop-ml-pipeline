@@ -14,7 +14,7 @@ export function AppShell({ children }: AppShellProps) {
     { href: customerHref, label: "Customer Dashboard" },
     { href: `${customerHref}/new-order`, label: "New Order" },
     { href: `${customerHref}/orders`, label: "Order History" },
-    { href: "/warehouse/priority-queue", label: "Priority Queue" },
+    { href: "/warehouse/priority-queue", label: "Priority queue (fraud)" },
   ];
 
   const hasPublicSupabaseEnv = Boolean(

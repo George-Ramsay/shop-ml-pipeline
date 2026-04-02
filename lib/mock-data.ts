@@ -70,6 +70,8 @@ const orders: OrderRecord[] = [
     orderTotal: 209.62,
     riskScore: 18,
     isFraud: false,
+    actualFraud: null,
+    fraudReviewedAt: null,
   },
   {
     orderId: 30102,
@@ -89,6 +91,8 @@ const orders: OrderRecord[] = [
     orderTotal: 116.74,
     riskScore: 22,
     isFraud: false,
+    actualFraud: null,
+    fraudReviewedAt: null,
   },
   {
     orderId: 30103,
@@ -108,6 +112,8 @@ const orders: OrderRecord[] = [
     orderTotal: 264.6,
     riskScore: 41,
     isFraud: false,
+    actualFraud: null,
+    fraudReviewedAt: null,
   },
   {
     orderId: 30104,
@@ -127,6 +133,8 @@ const orders: OrderRecord[] = [
     orderTotal: 152.38,
     riskScore: 57,
     isFraud: false,
+    actualFraud: null,
+    fraudReviewedAt: null,
   },
   {
     orderId: 30105,
@@ -146,6 +154,8 @@ const orders: OrderRecord[] = [
     orderTotal: 88.27,
     riskScore: 35,
     isFraud: false,
+    actualFraud: null,
+    fraudReviewedAt: null,
   },
   {
     orderId: 30106,
@@ -165,6 +175,8 @@ const orders: OrderRecord[] = [
     orderTotal: 354.46,
     riskScore: 81,
     isFraud: true,
+    actualFraud: null,
+    fraudReviewedAt: null,
   },
 ];
 
@@ -321,6 +333,11 @@ function buildQueueRows(): PriorityQueueRow[] {
         shippingMethod: shipment.shippingMethod,
         promisedDays: shipment.promisedDays,
         actualDays: shipment.actualDays,
+        riskScore: order.riskScore,
+        isFraud: order.isFraud,
+        actualFraud: order.actualFraud,
+        fraudReviewedAt: order.fraudReviewedAt,
+        fraudScoredAt: null,
         lateDeliveryRisk,
         lateDeliveryLabel: riskToLabel(lateDeliveryRisk),
       });

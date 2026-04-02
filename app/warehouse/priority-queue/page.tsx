@@ -5,14 +5,32 @@ import { getPriorityQueueRows } from "@/lib/shop-data";
 
 export const dynamic = "force-dynamic";
 
+function latestFraudBatchIso(
+  rows: { fraudScoredAt: string | null }[],
+): string | null {
+  return rows.reduce<string | null>((best, row) => {
+    const t = row.fraudScoredAt;
+    if (!t) return best;
+    if (!best || t > best) return t;
+    return best;
+  }, null);
+}
+
 export default async function PriorityQueuePage() {
   const rows = await getPriorityQueueRows();
+  const latestIso = latestFraudBatchIso(rows);
+  const latestFraudBatchLabel = latestIso
+    ? new Intl.DateTimeFormat("en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(new Date(latestIso))
+    : null;
 
   return (
     <PageFrame
-      eyebrow="Late Delivery Priority Queue"
-      title="Warehouse late-delivery queue"
-      description="This warehouse queue is ranked from the deployed Supabase order and shipment data."
+      eyebrow="Warehouse operations"
+      title="Priority queue — fraud & late delivery"
+      description="Review model scores, record human fraud labels (same control as order history), and see late-delivery risk. Live Supabase data."
       actions={[
         {
           href: "/",
@@ -24,19 +42,23 @@ export default async function PriorityQueuePage() {
         <div className="space-y-4">
           <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
             <p className="text-sm font-semibold text-slate-950">
-              {rows.length} ranked orders
+              {rows.length} ranked orders (by order risk)
             </p>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-              These rows are computed from the live <code>orders</code>,{" "}
-              <code>customers</code>, and <code>shipments</code> tables so the
-              queue reflects the current deployed data.
+              <strong>Pred. fraud</strong> and <strong>Order risk</strong> come from the
+              scoring pipeline. <strong>Human review</strong> writes{" "}
+              <code>actual_fraud</code> (identical to the order history page).{" "}
+              <strong>Late delivery</strong> blends shipment timing with order risk.
             </p>
           </div>
 
           <PriorityQueueTable rows={rows} />
         </div>
 
-        <ScoringPanel />
+        <ScoringPanel
+          latestFraudBatchLabel={latestFraudBatchLabel}
+          orderCount={rows.length}
+        />
       </div>
     </PageFrame>
   );

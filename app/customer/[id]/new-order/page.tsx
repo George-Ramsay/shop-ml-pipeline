@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { PageFrame } from "@/components/page-frame";
+import { parseCustomerRouteId } from "@/lib/customer-route";
 import { formatCurrency } from "@/lib/format";
 import { getNewOrderPageData } from "@/lib/shop-data";
 
@@ -14,7 +15,10 @@ type NewOrderPageProps = {
 
 export default async function NewOrderPage({ params }: NewOrderPageProps) {
   const { id } = await params;
-  const customerId = Number(id);
+  const customerId = parseCustomerRouteId(id);
+  if (customerId === null) {
+    notFound();
+  }
   const data = await getNewOrderPageData(customerId);
 
   if (!data) {

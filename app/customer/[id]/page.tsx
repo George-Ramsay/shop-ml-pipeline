@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { PageFrame } from "@/components/page-frame";
 import { SummaryCard } from "@/components/summary-card";
+import { parseCustomerRouteId } from "@/lib/customer-route";
 import { formatCurrency, formatDateTime } from "@/lib/format";
 import { getCustomerDashboardData } from "@/lib/shop-data";
 
@@ -17,7 +18,10 @@ export default async function CustomerDashboardPage({
   params,
 }: CustomerDashboardPageProps) {
   const { id } = await params;
-  const customerId = Number(id);
+  const customerId = parseCustomerRouteId(id);
+  if (customerId === null) {
+    notFound();
+  }
   const data = await getCustomerDashboardData(customerId);
 
   if (!data) {

@@ -44,7 +44,11 @@ export type OrderRecord = {
   taxAmount: number;
   orderTotal: number;
   riskScore: number;
+  /** Model prediction (batch job). */
   isFraud: boolean;
+  /** Human ground truth; null = not reviewed. */
+  actualFraud: boolean | null;
+  fraudReviewedAt: string | null;
 };
 
 export type ShipmentRecord = {
@@ -69,6 +73,13 @@ export type PriorityQueueRow = {
   shippingMethod: ShippingMethod;
   promisedDays: number;
   actualDays: number | null;
+  /** From ML pipeline batch (`npm run fraud:score` / nightly job); drives `isFraud`. */
+  riskScore: number;
+  isFraud: boolean;
+  actualFraud: boolean | null;
+  fraudReviewedAt: string | null;
+  /** When the fraud batch last wrote this order (Supabase `fraud_scored_at`). */
+  fraudScoredAt: string | null;
   lateDeliveryRisk: number;
   lateDeliveryLabel: "High" | "Medium" | "Low";
 };

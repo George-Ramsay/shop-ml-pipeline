@@ -43,6 +43,9 @@ type OrderRow = {
   order_total: number | string;
   risk_score: number | string;
   is_fraud: boolean;
+  fraud_scored_at?: string | null;
+  actual_fraud?: boolean | null;
+  fraud_reviewed_at?: string | null;
 };
 
 type ShipmentRow = {
@@ -53,6 +56,44 @@ type ShipmentRow = {
   actual_days: number;
   late_delivery: boolean;
 };
+
+/** Supabase error when migration `add_actual_fraud_review` has not been applied yet. */
+function isMissingFraudReviewColumnsError(message: string) {
+  if (!message.includes("does not exist")) {
+    return false;
+  }
+  return message.includes("actual_fraud") || message.includes("fraud_reviewed_at");
+}
+
+const ORDER_SELECT_BASE =
+  "order_id, customer_id, order_datetime, billing_zip, shipping_zip, shipping_state, payment_method, device_type, ip_country, promo_used, promo_code, order_subtotal, shipping_fee, tax_amount, order_total, risk_score, is_fraud";
+
+const ORDER_SELECT_WITH_FRAUD_REVIEW = `${ORDER_SELECT_BASE}, actual_fraud, fraud_reviewed_at`;
+
+const PRIORITY_QUEUE_SELECT_BASE = `${ORDER_SELECT_BASE}, customers!inner(customer_id, full_name), shipments(order_id, carrier, shipping_method, promised_days, actual_days, late_delivery)`;
+
+const PRIORITY_QUEUE_SELECT_WITH_REVIEW = `${ORDER_SELECT_WITH_FRAUD_REVIEW}, customers!inner(customer_id, full_name), shipments(order_id, carrier, shipping_method, promised_days, actual_days, late_delivery)`;
+
+async function selectOrdersForCustomer(
+  supabase: ReturnType<typeof createSupabaseServerClient>,
+  customerId: number,
+) {
+  const primary = await supabase
+    .from("orders")
+    .select(ORDER_SELECT_WITH_FRAUD_REVIEW)
+    .eq("customer_id", customerId)
+    .order("order_datetime", { ascending: false });
+
+  if (primary.error && isMissingFraudReviewColumnsError(primary.error.message)) {
+    return supabase
+      .from("orders")
+      .select(ORDER_SELECT_BASE)
+      .eq("customer_id", customerId)
+      .order("order_datetime", { ascending: false });
+  }
+
+  return primary;
+}
 
 type QueueOrderRow = OrderRow & {
   customers:
@@ -108,6 +149,11 @@ function mapOrder(row: OrderRow): OrderRecord {
     orderTotal: toNumber(row.order_total),
     riskScore: toNumber(row.risk_score),
     isFraud: row.is_fraud,
+    actualFraud:
+      row.actual_fraud === null || row.actual_fraud === undefined
+        ? null
+        : Boolean(row.actual_fraud),
+    fraudReviewedAt: row.fraud_reviewed_at ?? null,
   };
 }
 
@@ -203,23 +249,18 @@ export async function getCustomerDashboardData(customerId: number) {
   noStore();
 
   const supabase = createSupabaseServerClient();
-  const [{ data: customerRow, error: customerError }, { data: orderRows, error: orderError }] =
-    await Promise.all([
-      supabase
-        .from("customers")
-        .select(
-          "customer_id, full_name, email, gender, birthdate, created_at, city, state, zip_code, customer_segment, loyalty_tier, is_active",
-        )
-        .eq("customer_id", customerId)
-        .maybeSingle(),
-      supabase
-        .from("orders")
-        .select(
-          "order_id, customer_id, order_datetime, billing_zip, shipping_zip, shipping_state, payment_method, device_type, ip_country, promo_used, promo_code, order_subtotal, shipping_fee, tax_amount, order_total, risk_score, is_fraud",
-        )
-        .eq("customer_id", customerId)
-        .order("order_datetime", { ascending: false }),
-    ]);
+  const [{ data: customerRow, error: customerError }, orderResult] = await Promise.all([
+    supabase
+      .from("customers")
+      .select(
+        "customer_id, full_name, email, gender, birthdate, created_at, city, state, zip_code, customer_segment, loyalty_tier, is_active",
+      )
+      .eq("customer_id", customerId)
+      .maybeSingle(),
+    selectOrdersForCustomer(supabase, customerId),
+  ]);
+
+  const { data: orderRows, error: orderError } = orderResult;
 
   if (customerError) {
     throw new Error(`Failed to load customer ${customerId}: ${customerError.message}`);
@@ -248,23 +289,18 @@ export async function getCustomerOrdersData(customerId: number) {
   noStore();
 
   const supabase = createSupabaseServerClient();
-  const [{ data: customerRow, error: customerError }, { data: orderRows, error: orderError }] =
-    await Promise.all([
-      supabase
-        .from("customers")
-        .select(
-          "customer_id, full_name, email, gender, birthdate, created_at, city, state, zip_code, customer_segment, loyalty_tier, is_active",
-        )
-        .eq("customer_id", customerId)
-        .maybeSingle(),
-      supabase
-        .from("orders")
-        .select(
-          "order_id, customer_id, order_datetime, billing_zip, shipping_zip, shipping_state, payment_method, device_type, ip_country, promo_used, promo_code, order_subtotal, shipping_fee, tax_amount, order_total, risk_score, is_fraud",
-        )
-        .eq("customer_id", customerId)
-        .order("order_datetime", { ascending: false }),
-    ]);
+  const [{ data: customerRow, error: customerError }, orderResult] = await Promise.all([
+    supabase
+      .from("customers")
+      .select(
+        "customer_id, full_name, email, gender, birthdate, created_at, city, state, zip_code, customer_segment, loyalty_tier, is_active",
+      )
+      .eq("customer_id", customerId)
+      .maybeSingle(),
+    selectOrdersForCustomer(supabase, customerId),
+  ]);
+
+  const { data: orderRows, error: orderError } = orderResult;
 
   if (customerError) {
     throw new Error(`Failed to load customer ${customerId}: ${customerError.message}`);
@@ -307,19 +343,27 @@ export async function getPriorityQueueRows(limit = 50) {
   noStore();
 
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase
+
+  const primary = await supabase
     .from("orders")
-    .select(
-      "order_id, customer_id, order_datetime, billing_zip, shipping_zip, shipping_state, payment_method, device_type, ip_country, promo_used, promo_code, order_subtotal, shipping_fee, tax_amount, order_total, risk_score, is_fraud, customers!inner(customer_id, full_name), shipments(order_id, carrier, shipping_method, promised_days, actual_days, late_delivery)",
-    )
+    .select(PRIORITY_QUEUE_SELECT_WITH_REVIEW)
     .order("risk_score", { ascending: false })
     .limit(limit);
 
-  if (error) {
-    throw new Error(`Failed to load priority queue: ${error.message}`);
+  const res =
+    primary.error && isMissingFraudReviewColumnsError(primary.error.message)
+      ? await supabase
+          .from("orders")
+          .select(PRIORITY_QUEUE_SELECT_BASE)
+          .order("risk_score", { ascending: false })
+          .limit(limit)
+      : primary;
+
+  if (res.error) {
+    throw new Error(`Failed to load priority queue: ${res.error.message}`);
   }
 
-  return ((data ?? []) as QueueOrderRow[]).flatMap((row) => {
+  return ((res.data ?? []) as QueueOrderRow[]).flatMap((row) => {
     const customer = Array.isArray(row.customers) ? row.customers[0] ?? null : row.customers;
     const shipment = Array.isArray(row.shipments)
       ? row.shipments[0] ?? null
@@ -351,6 +395,14 @@ export async function getPriorityQueueRows(limit = 50) {
         shippingMethod: shipment.shipping_method,
         promisedDays: shipment.promised_days,
         actualDays: shipment.actual_days,
+        riskScore: toNumber(row.risk_score),
+        isFraud: row.is_fraud,
+        actualFraud:
+          row.actual_fraud === null || row.actual_fraud === undefined
+            ? null
+            : Boolean(row.actual_fraud),
+        fraudReviewedAt: row.fraud_reviewed_at ?? null,
+        fraudScoredAt: null,
         lateDeliveryRisk,
         lateDeliveryLabel: riskToLabel(lateDeliveryRisk),
       },

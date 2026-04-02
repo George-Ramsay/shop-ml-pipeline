@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { OrdersTable } from "@/components/orders-table";
 import { PageFrame } from "@/components/page-frame";
+import { parseCustomerRouteId } from "@/lib/customer-route";
 import { getCustomerOrdersData } from "@/lib/shop-data";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +17,10 @@ export default async function OrderHistoryPage({
   params,
 }: OrderHistoryPageProps) {
   const { id } = await params;
-  const customerId = Number(id);
+  const customerId = parseCustomerRouteId(id);
+  if (customerId === null) {
+    notFound();
+  }
   const data = await getCustomerOrdersData(customerId);
 
   if (!data) {
@@ -47,12 +51,14 @@ export default async function OrderHistoryPage({
             {orders.length} orders loaded
           </p>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            The rows below come from the live <code>orders</code> table, mapped
-            into the same UI shape the rest of the app uses.
+            The rows below come from the live <code>orders</code> table. Use{" "}
+            <strong>Human review</strong> to record whether an order was actually
+            fraud; nightly retraining can use those labels (same control as the
+            warehouse queue).
           </p>
         </div>
 
-        <OrdersTable orders={orders} />
+        <OrdersTable orders={orders} customerId={customerId} />
       </div>
     </PageFrame>
   );
